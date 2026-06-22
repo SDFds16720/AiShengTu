@@ -1,12 +1,14 @@
-import React from 'react';
-import { Card, Input, Button, Space, Row, Col, message } from 'antd';
+import React, { useState } from 'react';
+import { Card, Input, Button, Space, Row, Col, message, Select } from 'antd';
 import { SendOutlined, ClearOutlined } from '@ant-design/icons';
 import { useImageStore, useModelStore, useTaskStore } from '@/store';
 import { ImageUploader } from '../ImageUploader';
 import { GenerationService } from '@/services/GenerationService';
+import { ALL_MODELS } from '@/config/models';
 import './index.css';
 
 const { TextArea } = Input;
+const { Option } = Select;
 
 export const InputArea: React.FC = () => {
   const {
@@ -21,6 +23,12 @@ export const InputArea: React.FC = () => {
   const addTask = useTaskStore((state) => state.addTask);
   const updateTaskStatus = useTaskStore((state) => state.updateTaskStatus);
 
+  const [generationType, setGenerationType] = useState<'text2img' | 'img2img'>('text2img');
+  const [selectedSize, setSelectedSize] = useState<string>('1024x1024');
+
+  const selectedModelConfig = ALL_MODELS.find(m => m.id === selectedModel);
+  const supportedSizes = selectedModelConfig?.supportedSizes || ['1024x1024'];
+
   const handleGenerate = async () => {
     if (!selectedModel) {
       message.warning('请先选择生成模型');
@@ -29,6 +37,11 @@ export const InputArea: React.FC = () => {
 
     if (!prompt && !inputImage) {
       message.warning('请输入文字描述或上传图片');
+      return;
+    }
+
+    if (generationType === 'img2img' && !inputImage) {
+      message.warning('图生图模式需要上传参考图片');
       return;
     }
 
@@ -45,8 +58,16 @@ export const InputArea: React.FC = () => {
     message.loading({ content: '正在调用 API 生成图片...', key: 'generating' });
 
     try {
-      // Call real API
-      const result = await GenerationService.generateAndDownload(prompt, selectedModel);
+      // Call real API with type and size
+      const result = await GenerationService.generateAndDownload(
+        prompt,
+        selectedModel,
+        {
+          type: generationType,
+          size: selectedSize,
+          inputImage: inputImage?.preview,
+        }
+      );
 
       // Add generated image to results
       addGeneratedImage({
@@ -76,6 +97,41 @@ export const InputArea: React.FC = () => {
     <Row gutter={24}>
       <Col xs={24} lg={12}>
         <Card className="input-area-card" title="输入描述">
+          {/* Generation Type and Size Selectors */}
+          <Space style={{ marginBottom: 16, width: '100%' }} size="middle">
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: 4, fontSize: 12, color: '#666' }}>
+                生成类型
+              </label>
+              <Select
+                value={generationType}
+                onChange={setGenerationType}
+                style={{ width: '100%' }}
+                disabled={isGenerating}
+              >
+                <Option value="text2img">文生图</Option>
+                <Option value="img2img">图生图</Option>
+              </Select>
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: 4, fontSize: 12, color: '#666' }}>
+                图片尺寸
+              </label>
+              <Select
+                value={selectedSize}
+                onChange={setSelectedSize}
+                style={{ width: '100%' }}
+                disabled={isGenerating}
+              >
+                {supportedSizes.map(size => (
+                  <Option key={size} value={size}>{size}</Option>
+                ))}
+              </Select>
+            </div>
+          </Space>
+
+          {/* Prompt Input */}
           <TextArea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -84,6 +140,8 @@ export const InputArea: React.FC = () => {
             className="prompt-input"
             disabled={isGenerating}
           />
+
+          {/* Action Buttons */}
           <Space className="action-buttons" size="middle">
             <Button
               type="primary"

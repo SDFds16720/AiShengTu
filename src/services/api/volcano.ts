@@ -26,12 +26,28 @@ export class VolcanoAPI extends BaseImageAPI {
 
   async generate(config: ImageGenerationConfig): Promise<GenerationResult> {
     try {
+      // Map size to volcano engine format
+      let volcanoSize = '1024x1024';
+      if (config.size) {
+        // Convert size format (e.g., "2048x2048" to "2K")
+        const [width, height] = config.size.split('x').map(Number);
+        if (width >= 2048 || height >= 2048) {
+          volcanoSize = '2K';
+        } else if (width >= 1536 || height >= 1536) {
+          volcanoSize = '1.5K';
+        } else if (width >= 1024 || height >= 1024) {
+          volcanoSize = '1024x1024';
+        } else {
+          volcanoSize = '512x512';
+        }
+      }
+
       const requestData = {
         model: config.model,
         prompt: config.prompt,
         sequential_image_generation: 'disabled',
         response_format: 'url',
-        size: '2K',
+        size: volcanoSize,
         stream: false,
         watermark: true,
       };

@@ -9,7 +9,12 @@ import axios from 'axios';
 export class GenerationService {
   static async generateImage(
     prompt: string,
-    model?: string
+    model?: string,
+    options?: {
+      type?: 'text2img' | 'img2img';
+      size?: string;
+      inputImage?: string;
+    }
   ): Promise<GenerationResult> {
     const selectedModel = model || useModelStore.getState().selectedModel;
 
@@ -33,6 +38,8 @@ export class GenerationService {
       provider,
       configEnabled: config?.enabled,
       hasApiKey: !!config?.apiKey,
+      type: options?.type || 'text2img',
+      size: options?.size || '1024x1024',
     });
 
     if (!config || !config.enabled) {
@@ -46,8 +53,10 @@ export class GenerationService {
     const generationConfig: ImageGenerationConfig = {
       model: selectedModel,
       prompt,
-      size: '1024x1024',
+      size: options?.size || '1024x1024',
       n: 1,
+      type: options?.type || 'text2img',
+      inputImage: options?.inputImage,
     };
 
     try {
@@ -137,12 +146,17 @@ export class GenerationService {
 
   static async generateAndDownload(
     prompt: string,
-    model?: string
+    model?: string,
+    options?: {
+      type?: 'text2img' | 'img2img';
+      size?: string;
+      inputImage?: string;
+    }
   ): Promise<GenerationResult> {
     console.log('[GenerationService] Starting generateAndDownload');
 
     // Generate image
-    const result = await this.generateImage(prompt, model);
+    const result = await this.generateImage(prompt, model, options);
     console.log('[GenerationService] Generation result:', {
       imageUrl: result.imageUrl,
       status: result.status,

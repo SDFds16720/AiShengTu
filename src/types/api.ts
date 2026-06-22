@@ -6,6 +6,8 @@ export interface ImageGenerationConfig {
   quality?: 'standard' | 'hd';
   style?: 'vivid' | 'natural';
   n?: number;
+  type?: 'text2img' | 'img2img';
+  inputImage?: string; // Base64 or URL
 }
 
 export interface GenerationResult {
