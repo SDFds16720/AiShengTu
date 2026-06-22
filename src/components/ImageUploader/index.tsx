@@ -3,7 +3,6 @@ import { Card, Upload, message, Image } from 'antd';
 import { InboxOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useImageStore } from '@/store';
 import { ImageService } from '@/services/ImageService';
-import type { UploadFile } from 'antd/es/upload/interface';
 import './index.css';
 
 const { Dragger } = Upload;

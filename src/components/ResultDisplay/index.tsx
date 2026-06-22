@@ -2,20 +2,77 @@ import React from 'react';
 import { Card, Image, Empty, Button, Space, message } from 'antd';
 import { DownloadOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useImageStore } from '@/store';
+import { useAPIConfigStore } from '@/store/useAPIConfigStore';
 import { ImageService } from '@/services/ImageService';
+import { saveAs } from 'file-saver';
 import './index.css';
 
 export const ResultDisplay: React.FC = () => {
   const { generatedImages, clearGeneratedImages } = useImageStore();
+  const { appConfig } = useAPIConfigStore();
 
   const handleDownload = async (imageUrl: string, model: string, prompt?: string) => {
     try {
       const filename = ImageService.generateFilename(model, prompt);
-      await ImageService.downloadImage(imageUrl, filename);
-      message.success('图片下载成功');
+
+      // Ensure we have a Data URL
+      let dataUrl = imageUrl;
+
+      // If it's not already a Data URL, download it first
+      if (!imageUrl.startsWith('data:')) {
+        if (typeof window !== 'undefined' && (window as any).electronAPI?.downloadImage) {
+          console.log('[ResultDisplay] Downloading image via IPC...');
+          dataUrl = await (window as any).electronAPI.downloadImage(imageUrl);
+          console.log('[ResultDisplay] Image downloaded successfully');
+        } else {
+          message.error('Electron API 未加载，请使用 Electron 应用打开');
+          return;
+        }
+      }
+
+      // Check if auto-save is enabled
+      if (appConfig.autoSaveEnabled && appConfig.autoSavePath && (window as any).electronAPI?.saveImageAuto) {
+        console.log('[ResultDisplay] Auto-saving to:', appConfig.autoSavePath);
+
+        try {
+          const result = await (window as any).electronAPI.saveImageAuto(
+            dataUrl,
+            appConfig.autoSavePath,
+            filename
+          );
+
+          if (result.success) {
+            message.success(`图片已自动保存到: ${result.filePath}`);
+            return;
+          }
+        } catch (autoSaveError) {
+          console.error('[ResultDisplay] Auto save failed, falling back to dialog:', autoSaveError);
+          // If auto-save fails, continue to show dialog
+        }
+      }
+
+      // Show save dialog if auto-save is disabled or failed
+      if (typeof window !== 'undefined' && (window as any).electronAPI?.saveBase64Image) {
+        console.log('[ResultDisplay] Using Electron native save dialog');
+        const result = await (window as any).electronAPI.saveBase64Image(dataUrl, filename);
+
+        if (result.canceled) {
+          console.log('[ResultDisplay] Save canceled by user');
+          return;
+        }
+
+        message.success(`图片已保存到: ${result.filePath}`);
+      } else {
+        // Browser fallback
+        console.log('[ResultDisplay] Electron API not available, using browser fallback');
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        saveAs(blob, filename);
+        message.success('图片保存成功');
+      }
     } catch (error) {
-      message.error('图片下载失败');
-      console.error('Download error:', error);
+      console.error('[ResultDisplay] Download error:', error);
+      message.error('图片保存失败');
     }
   };
 

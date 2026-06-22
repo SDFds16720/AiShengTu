@@ -77,7 +77,7 @@ export class OpenAIAPI extends BaseImageAPI {
     ];
   }
 
-  async checkStatus(taskId: string): Promise<GenerationResult> {
+  async checkStatus(_taskId: string): Promise<GenerationResult> {
     // OpenAI API 是同步的，不需要检查状态
     return {
       imageUrl: '',

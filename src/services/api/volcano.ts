@@ -6,13 +6,11 @@ const VOLCANO_BASE_URL = 'https://ark.cn-beijing.volces.com/api/v3';
 
 export class VolcanoAPI extends BaseImageAPI {
   private apiKey: string;
-  private accessKey: string;
   private client;
 
-  constructor(apiKey: string, accessKey: string) {
+  constructor(apiKey: string) {
     super();
     this.apiKey = apiKey;
-    this.accessKey = accessKey;
     this.client = axios.create({
       baseURL: VOLCANO_BASE_URL,
       headers: {
@@ -31,25 +29,59 @@ export class VolcanoAPI extends BaseImageAPI {
       const requestData = {
         model: config.model,
         prompt: config.prompt,
-        size: config.size || '1024x1024',
+        sequential_image_generation: 'disabled',
+        response_format: 'url',
+        size: '2K',
+        stream: false,
+        watermark: true,
       };
 
       const response = await this.client.post('/images/generations', requestData);
 
+      // Handle different response formats
+      let imageUrl = '';
+
+      if (response.data.data && response.data.data[0]) {
+        // Standard OpenAI-like format
+        imageUrl = response.data.data[0].url || response.data.data[0].b64_json;
+      } else if (response.data.url) {
+        // Direct URL format
+        imageUrl = response.data.url;
+      } else if (response.data.image_url) {
+        // Alternative format
+        imageUrl = response.data.image_url;
+      }
+
+      if (!imageUrl) {
+        console.error('Unexpected response format:', response.data);
+        throw new Error('API 返回格式异常：未找到图片地址');
+      }
+
       return {
-        imageUrl: response.data.data[0].url,
-        taskId: response.data.task_id,
-        status: response.data.status || 'completed',
+        imageUrl,
+        taskId: response.data.task_id || response.data.id,
+        status: 'completed',
         model: config.model,
         prompt: config.prompt,
         createdAt: new Date().toISOString(),
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Volcano generation error:', error);
-      return {
-        imageUrl: '',
-        status: 'failed',
-      };
+
+      let errorMessage = '火山引擎生成失败';
+
+      if (error.response?.data?.error?.message) {
+        errorMessage = error.response.data.error.message;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      // Throw error with message so it can be caught by caller
+      const customError = new Error(errorMessage);
+      (customError as any).response = error.response;
+      throw customError;
     }
   }
 

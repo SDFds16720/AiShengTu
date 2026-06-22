@@ -1,0 +1,38 @@
+.settings-button {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.settings-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.settings-modal .ant-modal-body {
+  padding: 24px;
+}
+
+.config-section {
+  padding: 16px 0;
+}
+
+.config-section .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.config-section .ant-alert {
+  margin-bottom: 16px;
+}
+
+.config-section ul {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.config-section li {
+  margin: 4px 0;
+}

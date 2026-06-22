@@ -9,6 +9,16 @@ coverage/
 # Production
 build/
 dist/
+dist-electron/
+build-output/
+
+# Electron
+*.zip
+chromedriver-*/
+
+# Test files
+test-api.js
+test-electron.html
 
 # Misc
 .DS_Store

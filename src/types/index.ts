@@ -1,5 +1,4 @@
-import { ModelInfo } from './models';
-import { GenerationResult } from './api';
+import type { GenerationResult } from './api';
 
 export * from './models';
 export * from './api';
@@ -17,4 +16,16 @@ export interface HistoryItem extends GenerationResult {
 export interface ImageFile {
   file: File;
   preview: string;
+}
+
+export type TaskStatus = 'pending' | 'generating' | 'success' | 'failed';
+
+export interface Task {
+  id: string;
+  status: TaskStatus;
+  prompt?: string;
+  model: string;
+  errorMessage?: string;
+  createdAt: number;
+  updatedAt: number;
 }

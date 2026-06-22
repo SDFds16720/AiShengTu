@@ -3,27 +3,81 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "main": "dist-electron/main.js",
+  "homepage": "./",
+  "author": "SDFds16720",
+  "description": "一款参考向日葵远程控制和ToDesk风格设计的文生图/图生图应用，支持多平台AI模型调用。",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:build": "npm run build && cross-env ELECTRON_CACHE=%LOCALAPPDATA%\\electron\\Cache electron-builder",
+    "build:local": "build-local.bat"
   },
   "dependencies": {
+    "antd": "^5.19.1",
+    "axios": "^1.7.2",
+    "file-saver": "^2.0.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "antd": "^5.19.1",
-    "zustand": "^4.5.4",
-    "axios": "^1.7.2",
     "react-dropzone": "^14.2.3",
     "react-image-crop": "^11.0.5",
-    "file-saver": "^2.0.5"
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^10.0.3",
+    "cross-env": "^10.1.0",
+    "electron": "^42.4.1",
+    "electron-builder": "^26.15.3",
+    "terser": "^5.48.0",
     "typescript": "^5.5.3",
-    "vite": "^5.3.3"
+    "vite": "^5.3.3",
+    "vite-plugin-electron": "^1.0.4",
+    "wait-on": "^9.0.10"
+  },
+  "build": {
+    "appId": "com.aishengtu.app",
+    "productName": "AI Image Studio",
+    "compression": "maximum",
+    "electronVersion": "42.4.1",
+    "electronDist": "node_modules/electron/dist",
+    "directories": {
+      "output": "build-output"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/vite.svg"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": true
+    },
+    "electronLanguages": [
+      "zh-CN",
+      "en-US"
+    ]
   }
 }

@@ -4,6 +4,8 @@ import { ImageUploader } from './ImageUploader';
 import { ResultDisplay } from './ResultDisplay';
 import { HistoryPanel } from './HistoryPanel';
 import { Layout } from './Layout';
+import { SettingsModal } from './SettingsModal';
+import { TaskStatusPanel } from './TaskStatusPanel';
 
 export {
   ModelSelector,
@@ -12,4 +14,6 @@ export {
   ResultDisplay,
   HistoryPanel,
   Layout,
+  SettingsModal,
+  TaskStatusPanel,
 };

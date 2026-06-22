@@ -9,7 +9,7 @@ export class APIFactory {
 
   static createAPI(
     provider: APIProvider,
-    config?: { apiKey?: string; accessKey?: string }
+    config?: { apiKey?: string }
   ): BaseImageAPI {
     const key = `${provider}-${config?.apiKey || 'default'}`;
 
@@ -28,10 +28,10 @@ export class APIFactory {
         break;
 
       case 'volcano':
-        if (!config?.apiKey || !config?.accessKey) {
-          throw new Error('Volcano API key and Access key are required');
+        if (!config?.apiKey) {
+          throw new Error('Volcano API key is required');
         }
-        api = new VolcanoAPI(config.apiKey, config.accessKey);
+        api = new VolcanoAPI(config.apiKey);
         break;
 
       case 'custom':
