@@ -43,6 +43,9 @@ export const ModelSelector: React.FC = () => {
           style={{ width: '100%' }}
           placeholder="请选择生成模型"
           size="large"
+          dropdownMatchSelectWidth={false}
+          dropdownStyle={{ minWidth: '500px' }}
+          listHeight={300}
         >
           <Select.OptGroup label="🔥 火山引擎 - Doubao-Seedream">
             {VOLCANO_MODELS.map(model => (
