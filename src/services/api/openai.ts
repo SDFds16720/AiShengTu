@@ -2,7 +2,7 @@ import axios from 'axios';
 import { BaseImageAPI } from './base';
 import { ImageGenerationConfig, GenerationResult, ModelInfo } from '@/types';
 
-const OPENAI_BASE_URL = 'https://api.openai.com/v1';
+const OPENAI_BASE_URL = 'https://www.cctq.ai/v1';
 
 export class OpenAIAPI extends BaseImageAPI {
   private apiKey: string;
@@ -57,22 +57,13 @@ export class OpenAIAPI extends BaseImageAPI {
   async getModels(): Promise<ModelInfo[]> {
     return [
       {
-        id: 'dall-e-3',
-        name: 'DALL-E 3',
+        id: 'gpt-image-2',
+        name: 'GPT Image 2',
         provider: 'openai',
-        description: '最新的DALL-E模型，生成高质量图片',
+        description: 'GPT Image 2 模型，高质量图片生成',
         type: 'text2img',
         maxSize: '1024x1024',
-        supportedSizes: ['1024x1024', '1792x1024', '1024x1792'],
-      },
-      {
-        id: 'dall-e-2',
-        name: 'DALL-E 2',
-        provider: 'openai',
-        description: 'DALL-E第二代模型',
-        type: 'both',
-        maxSize: '1024x1024',
-        supportedSizes: ['256x256', '512x512', '1024x1024'],
+        supportedSizes: ['512x512', '1024x1024', '1792x1024', '1024x1792'],
       },
     ];
   }

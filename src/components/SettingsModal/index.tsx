@@ -58,7 +58,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose }) =
       <div className="config-section">
         <Alert
           message="OpenAI API 配置"
-          description="配置 OpenAI API 密钥以使用 DALL-E 模型"
+          description="配置 OpenAI API 密钥以使用 GPT Image 2 模型（使用中转站）"
           type="info"
           showIcon
           style={{ marginBottom: 16 }}
@@ -75,12 +75,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose }) =
         >
           <Input.Password
             prefix={<KeyOutlined />}
-            placeholder="sk-..."
+            placeholder="输入 API Key"
           />
         </Form.Item>
 
         <Form.Item label="API Base URL" name="openai_baseUrl">
-          <Input prefix={<ApiOutlined />} placeholder="https://api.openai.com/v1" />
+          <Input prefix={<ApiOutlined />} placeholder="https://www.cctq.ai/v1" />
         </Form.Item>
       </div>
     );
@@ -238,7 +238,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose }) =
     autoSaveEnabled: appConfig.autoSaveEnabled || false,
     autoSavePath: appConfig.autoSavePath || '',
     openai_apiKey: configs.openai?.apiKey || '',
-    openai_baseUrl: configs.openai?.baseUrl || 'https://api.openai.com/v1',
+    openai_baseUrl: configs.openai?.baseUrl || 'https://www.cctq.ai/v1',
     openai_enabled: configs.openai?.enabled || false,
     volcano_apiKey: configs.volcano?.apiKey || '',
     volcano_baseUrl: configs.volcano?.baseUrl || 'https://ark.cn-beijing.volces.com/api/v3',

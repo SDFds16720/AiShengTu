@@ -28,7 +28,7 @@ const DEFAULT_CONFIGS: Record<string, APIConfig> = {
   openai: {
     provider: 'openai',
     apiKey: '',
-    baseUrl: 'https://api.openai.com/v1',
+    baseUrl: 'https://www.cctq.ai/v1',
     enabled: false,
   },
   volcano: {
